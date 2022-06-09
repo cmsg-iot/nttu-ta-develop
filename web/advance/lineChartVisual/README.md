@@ -9,4 +9,4 @@
 - 在 `存檔管理` 處點擊 `匯入` 選擇 `lineChartVisual.json` 匯入
 - 在 `存檔管理` 處點擊 `連結匯入` 輸入以下連結匯入(不用另外下載檔案)
 
-- https://raw.githubusercontent.com/cmsg-iot/nttu-ta-develop/master/lineChartVisual.json
+- https://raw.githubusercontent.com/cmsg-iot/nttu-ta-develop/master/web/advance/lineChartVisual/lineChartVisual.json

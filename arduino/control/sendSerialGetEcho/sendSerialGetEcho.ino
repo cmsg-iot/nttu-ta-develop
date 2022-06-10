@@ -4,9 +4,8 @@ int loop_delay = 300;         // 每次迴圈間隔時間
 
 void setup()
 {
-    Serial.begin(115200);         // 設定 baud
-    pinMode(LED_RED_PIN, OUTPUT); // 設定 LED_RED_PIN 為輸出腳位
-    while (Serial.read() >= 0)    // 初始化
+    Serial.begin(115200);      // 設定 baud
+    while (Serial.read() >= 0) // 初始化
     {
     }
     Serial.setTimeout(50); // 設定 Serial 最大等待時間(毫秒)

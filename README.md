@@ -6,7 +6,7 @@
 
 ### Sensors
 
-- [AM2302](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/sensors/AM2302)
+- [AM2320](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/sensors/AM2320)
 - [MPU6050](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/sensors/MPU6050)
 - [MQ-5](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/sensors/MQ5)
 

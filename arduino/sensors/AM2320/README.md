@@ -1,0 +1,10 @@
+# AM2320
+
+使用 Pico 讀取 AM2320 資料，以 JSON 格式輸出於 `Serial Monitor` 中
+
+## Usage
+
+- 下載 AM2320 Library [hibikiledo/AM2320](https://github.com/hibikiledo/AM2320)，解壓縮後放在 `Arduino/libraries` 底下
+- 下載 Arduino Json Library [bblanchon/ArduinoJson](https://github.com/bblanchon/ArduinoJson)，解壓縮後放在 `Arduino/libraries` 底下
+- 開啟 `AM2320.ino`， 選擇 `Arduino Mbed OS RP2040 Boards` 中的 `Raspberry Pi Pico` 進行燒錄
+- 開啟 `Serial Monitor` 觀察輸出數據

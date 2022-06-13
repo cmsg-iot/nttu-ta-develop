@@ -65,7 +65,8 @@ void loop()
             }
             else if (string_from_char == "yellow off")
             {
-                brightness_yellow = 0 analogWrite(LED_YELLOW_PIN, LOW);
+                brightness_yellow = 0;
+                analogWrite(LED_YELLOW_PIN, LOW);
             }
             else if (string_from_char.substring(0, 8) == "green on")
             {

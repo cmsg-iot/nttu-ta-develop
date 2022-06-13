@@ -19,23 +19,26 @@ int fadeAmount_yellow = 5;
 int brightness_green = 0;
 int fadeAmount_green = 5;
 
+// 設定Pico第二個Hardware Serial 輸出腳位，用來跟ESP8266通訊
+UART Serial2(0, 1, NC, NC);
+
 void setup()
 {
-    Serial.begin(115200);         // 設定 baud
+    Serial2.begin(115200);        // 設定 baud
     pinMode(LED_RED_PIN, OUTPUT); // 設定 LED_RED_PIN 為輸出腳位
-    while (Serial.read() >= 0)    // 初始化
+    while (Serial2.read() >= 0)   // 初始化
     {
     }
-    Serial.setTimeout(50); // 設定 Serial 最大等待時間(毫秒)
+    Serial2.setTimeout(50); // 設定 Serial 最大等待時間(毫秒)
 }
 
 void loop()
 {
     // 當 Serial 有輸入資料時不斷執行
-    while (Serial.available() > 0)
+    while (Serial2.available() > 0)
     {
         // 從 Serial 讀取輸入字元
-        char_from_read = Serial.read();
+        char_from_read = Serial2.read();
 
         if (char_from_read != '\n' && char_from_read != '\r')
         {
@@ -45,7 +48,7 @@ void loop()
         else
         {
             // string_from_char 為輸入的完整字串
-            Serial.println(string_from_char);
+            Serial2.println(string_from_char);
 
             // 判斷字串控制LED亮度
             if (string_from_char.substring(0, 6) == "red on")

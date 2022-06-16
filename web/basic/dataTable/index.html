@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>資料表格視覺化</title>
+  </head>
+  <body>
+    <!--建立表格物件，class為樣式名稱，class可以重複使用來套用同樣的樣式-->
+    <table class="data-table">
+      <!--tr 為表格中的行物件(row)-->
+      <tr class="acceleration">
+        <!--th 為表格中的標頭物件(head)-->
+        <th>ax</th>
+        <th>ay</th>
+        <th>az</th>
+      </tr>
+      <tr>
+        <!--td 為表格中的元素物件(data)，id為唯一編號，一個網頁中的id不能重複-->
+        <td id="ax">999999</td>
+        <td id="ay">999999</td>
+        <td id="az">999999</td>
+      </tr>
+      <tr class="rotation">
+        <th>gx</th>
+        <th>gy</th>
+        <th>gz</th>
+      </tr>
+      <tr>
+        <td id="gx">999999</td>
+        <td id="gy">999999</td>
+        <td id="gz">999999</td>
+      </tr>
+    </table>
+  </body>
+</html>

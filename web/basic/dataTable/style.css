@@ -1,0 +1,39 @@
+/*table 物件的樣式*/
+.data-table {
+    /*物件的寬度*/
+    width: 400px;
+    
+    /*使物件置中*/
+    margin: auto;
+
+    /*使物件上方增加100px的空間*/
+    margin-top: 100px;
+
+    /*物件中文字大小為 24px*/
+    font-size: 24px;
+
+    /*物件中文字置中*/
+    text-align: center;
+}
+
+/*table 物件中 td 的樣式*/
+.data-table td {
+    /*固定 td 寬度使其不隨著數值長度變動*/
+    width: 125px;
+    
+    /*將物件四周填充 10px，增加表格的間距*/
+    padding: 10px;
+
+    /*物件背景顏色*/
+    background-color: #eee;
+}
+
+/*tr 物件中 th 的樣式*/
+.acceleration th {
+    background-color: lightgreen;
+}
+
+/*tr 物件中 th 的樣式*/
+.rotation th {
+    background-color: lightblue;
+}

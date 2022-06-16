@@ -28,9 +28,9 @@ void loop()
     //   使用 getErrorCode() 檢查錯誤訊息
     if (sensor.measure())
     {
-        data["temp"] = sensor.getTemperature(); // 取得溫度數值，存放在 temp 這個 key 中
-        data["hum"] = sensor.getHumidity();     // 取得濕度數值，存放在 hum 這個 key 中
-        serializeJsonPretty(data, Serial2);     // 顯示 data 於 Serial Monitor
+        data["temp"] = round2(sensor.getTemperature()); // 取得溫度數值，存放在 temp 這個 key 中
+        data["hum"] = round2(sensor.getHumidity());     // 取得濕度數值，存放在 hum 這個 key 中
+        serializeJsonPretty(data, Serial2);             // 顯示 data 於 Serial Monitor
     }
     else
     {                                          // 發生錯誤
@@ -45,11 +45,16 @@ void loop()
             data["error"] = "ERR: CRC validation failed."; // CRC驗證錯誤
             break;
         }
-        serializeJsonPretty(data, Serial2); // 顯示 data 於 Serial Monitor
+        serializeJson(data, Serial2); // 顯示 data 於 Serial Monitor
     }
     data.clear(); // 釋放 data 記憶體
 
     blinkState = !blinkState;              // 切換LED燈狀態
     digitalWrite(LED_BUILTIN, blinkState); // LED燈閃爍
-    delay(500);                            // 等待500毫秒
+    delay(1000);                           // 等待500毫秒
+}
+
+double round2(double value)
+{
+    return (int)(value * 100 + 0.5) / 100.0;
 }

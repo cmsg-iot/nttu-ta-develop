@@ -1,77 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-<meta charset='utf-8'>
-<title>WebUI</title>
+  <head>
+    <meta charset="utf-8" />
+    <title>WebUI</title>
 
-<style type="text/css">
-	table 
-	{
-		width: 100%;
-	}
-	caption
-	{
-		font-size : 50px;
-	}
-	th
-	{
-		font-size : 28px;
-      		text-align: center;
-	}
-	td 
-	{
-		font-size : 28px;
-      		text-align: center;
-	}
-	.button
-	{
-		border: none;
-		font-size:  40px;
-		display: inline-block;
-	}
-</style>
-</head>
-<body>
-<table >
-<caption>系統資訊畫面</caption>
-<tr>
-<th>Device Name</th>
-<td id='device'>*******</td>
-<th>Internet</th>
-<td id='wifi'>*******</td>
-<td> <button type='button' onclick="postCmd('@ap scan')">Scan AP</button></td>
-<th>Signal Quality<th>
-<td id='RSSI'>----</td>
-<th>OP Time<th>
-<td id='LT'>----</td>
-</tr>
-<tr>
-<th>UART bps:<th>
-<td id = 'bps' colspans="2" >----</td>
-<td></td>
-<th>SS bps:<th>
-<td id = 'SSbps' colspans="2" >----</td>
-<td></td>
-</tr>
-</table>
-<br/>
-<table>
-<caption>使用者訊息</caption>
-<tr></tr>
-</table>
-<br/><br/><br/>
-Command:
-<input type='text' id='WSSCMD'>
-<input type='button' value='Send' onclick='execCmd("WSSCMD")'>
-<button onclick="clearMsg()">Clear Msg</button>
-<br/>
-<br/>
+    <style type="text/css">
+      table {
+        width: 100%;
+      }
+      caption {
+        font-size: 50px;
+      }
+      th {
+        font-size: 28px;
+        text-align: center;
+      }
+      td {
+        font-size: 28px;
+        text-align: center;
+      }
+      .button {
+        border: none;
+        font-size: 40px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <caption>
+        系統資訊畫面
+      </caption>
+      <tr>
+        <th>Device Name</th>
+        <td id="device">*******</td>
+        <th>Internet</th>
+        <td id="wifi">*******</td>
+        <td>
+          <button type="button" onclick="postCmd('@ap scan')">Scan AP</button>
+        </td>
+        <th>Signal Quality</th>
+        <th></th>
+        <td id="RSSI">----</td>
+        <th>OP Time</th>
+        <th></th>
+        <td id="LT">----</td>
+      </tr>
+      <tr>
+        <th>UART bps:</th>
+        <th></th>
+        <td id="bps" colspans="2">----</td>
+        <td></td>
+        <th>SS bps:</th>
+        <th></th>
+        <td id="SSbps" colspans="2">----</td>
+        <td></td>
+      </tr>
+    </table>
+    <br />
+    <table>
+      <caption>
+        使用者訊息
+      </caption>
+      <tr></tr>
+    </table>
+    <br /><br /><br />
+    Command:
+    <input type="text" id="WSSCMD" />
+    <input type="button" value="Send" onclick='execCmd("WSSCMD")' />
+    <button onclick="clearMsg()">Clear Msg</button>
+    <br />
+    <br />
 
-<textarea id='tx' rows='20' cols='156' readonly ></textarea>
-<script src='./func.js'></script>
-<script src='./index.js'></script>
-<script> 
-  setTimeout('connect()',3000);
-</script>
-</body>
+    <textarea id="tx" rows="20" cols="156" readonly></textarea>
+    <script src="./func.js"></script>
+    <script src="./index.js"></script>
+    <script>
+      setTimeout("connect()", 3000);
+    </script>
+  </body>
 </html>

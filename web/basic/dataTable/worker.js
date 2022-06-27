@@ -34,14 +34,6 @@ function WSMsg(e) {
     if (e.data === undefined || e.data.indexOf('{"') != 0) {
       return;
     }
-    if (e.data.includes("content") && e.data.includes("from")) {
-      let ip = e.data
-        .substring(e.data.indexOf("REQ:") + 4, e.data.indexOf('"}'))
-        .split("from ")[1]
-        .split("\r\n")[0];
-      self.postMessage(JSON.parse(`{"tx":"IP:${ip}"}`));
-      return;
-    }
     jsData = JSON.parse(e.data);
     self.postMessage(jsData);
   } catch (error) {

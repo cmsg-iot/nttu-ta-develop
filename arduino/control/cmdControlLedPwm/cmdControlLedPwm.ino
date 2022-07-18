@@ -20,6 +20,7 @@ int brightness_green = 0;
 int fadeAmount_green = 5;
 
 // 設定Pico第二個Hardware Serial 輸出腳位，用來跟ESP8266通訊
+// 若想直接從Pico原本的USB Serial輸出，將 setup 後面的 Serial2 改成 Serial 便會以預設(USB Serial)輸出
 UART Serial2(0, 1, NC, NC);
 
 void setup()

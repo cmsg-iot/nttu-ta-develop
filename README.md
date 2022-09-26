@@ -2,7 +2,7 @@
 
 提供學生開發教具專題相關的範例，詳細說明與使用方式參考各子題的說明文件。
 
-## Arduino(Raspberry Pi Pico)
+## Arduino
 
 ### Sensors
 
@@ -15,6 +15,14 @@
 - [在 SerialMonitor 輸入字串並得到 Echo 回覆](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/control/sendSerialGetEcho)
 - [判斷輸入字串控制 LED 開關](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/control/cmdControlLed)
 - [判斷指令加上參數控制 LED 燈明暗](https://github.com/cmsg-iot/nttu-ta-develop/tree/master/arduino/control/cmdControlLedPwm)
+
+## Raspberry Pi Pico
+
+### Sensors
+
+### Control
+
+### FileSystem
 
 ## Web
 

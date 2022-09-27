@@ -1,0 +1,2 @@
+bright=50
+cycle=10

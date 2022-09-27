@@ -1,0 +1,4 @@
+pin=2
+bright=50
+cycle=10
+sleep=0.5

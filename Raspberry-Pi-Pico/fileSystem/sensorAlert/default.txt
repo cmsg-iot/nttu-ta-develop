@@ -1,0 +1,4 @@
+thresh=1
+sensor_minV=0.5
+sensor_maxV=4.5
+sensor_range=6

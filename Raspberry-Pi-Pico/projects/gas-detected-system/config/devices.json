@@ -1,0 +1,114 @@
+{
+  "module": {
+    "CD74HC4067": {
+      "type": "GPIO",
+      "gpio": [6, 7, 8, 9]
+    },
+    "Pressure_1": {
+      "module": "CD74HC4067",
+      "channel": 1
+    },
+    "Pressure_2": {
+      "module": "CD74HC4067",
+      "channel": 2
+    },
+    "MQ2": {
+      "module": "CD74HC4067",
+      "channel": 3
+    },
+    "MQ7": {
+      "module": "CD74HC4067",
+      "channel": 4
+    },
+    "AM2320": {
+      "type": "I2C",
+      "gpio": [4, 5]
+    },
+    "Weight": {
+      "type": "GPIO",
+      "gpio": [2, 3]
+    },
+    "Hall": {
+      "type": "GPIO",
+      "gpio": [10]
+    },
+    "Buzzer": {
+      "type": "GPIO",
+      "gpio": [11]
+    },
+    "Heater": {
+      "type": "GPIO",
+      "gpio": [12]
+    },
+    "Valve": {
+      "type": "GPIO",
+      "gpio": [13]
+    },
+    "BEExANT": {
+      "type": "UART",
+      "gpio": [16, 17]
+    }
+  },
+  "adjust": {
+    "Pressure_1": {
+      "shift": 0,
+      "radial": 0
+    },
+    "Pressure_2": {
+      "shift": 0,
+      "radial": 0
+    }
+  },
+  "data": [
+    {
+      "id": "p1",
+      "module": "Pressure_1",
+      "adjust": false
+    },
+    {
+      "id": "p2",
+      "module": "Pressure_2",
+      "adjust": false
+    },
+    {
+      "id": "mq2",
+      "module": "MQ2",
+      "adjust": false
+    },
+    {
+      "id": "mq7",
+      "module": "MQ7",
+      "adjust": false
+    },
+    {
+      "id": "temp",
+      "module": "AM2320",
+      "adjust": false
+    },
+    {
+      "id": "weight",
+      "module": "Weight",
+      "adjust": false
+    },
+    {
+      "id": "hall",
+      "module": "Hall",
+      "adjust": false
+    },
+    {
+      "id": "buzzer",
+      "module": "Buzzer",
+      "adjust": false
+    },
+    {
+      "id": "heater",
+      "module": "Heater",
+      "adjust": false
+    },
+    {
+      "id": "valve",
+      "module": "Valve",
+      "adjust": false
+    }
+  ]
+}

@@ -25,7 +25,6 @@ AM2320=[4,5]
 BEExANT=None
 
 def getMQ2(pin):
-    Pin(pin,Pin.IN)
     return Pin(pin)
 
 global __state

@@ -3,7 +3,6 @@ import utime
 
 adc = ADC(0)
 select_gpio = [9,8,7,6] # 排序為 S3,S2,S1,S0
-adc_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 for i in select_gpio:
     Pin(i,Pin.OUT)
@@ -25,11 +24,20 @@ def fillzero(bits):
             temp =  '0' + temp
     return temp
 
-while True:
-
-    for i in range(0,16):
+def readListOfADC(num):
+    adc_list=[]
+    for i in range(0,num):
         switchGPIO(i)
-        adc_list[i] = adc.read_u16()
+        adc_list.append(adc.read_u16())
+    return adc_list
 
-    print(adc_list)
+def readChannelOfADC(num):
+    switchGPIO(num)
+    read = adc.read_u16()
+    return read
+
+while True:
+    #read = readListOfADC(4)
+    read = [readChannelOfADC(0),readChannelOfADC(1),readChannelOfADC(2),readChannelOfADC(3)]
+    print(read)
     utime.sleep(0.1)

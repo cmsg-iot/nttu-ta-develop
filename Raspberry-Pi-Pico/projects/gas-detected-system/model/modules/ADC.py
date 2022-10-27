@@ -9,11 +9,13 @@ class Adc(CD74HC4067):
         self.radial = 1.0
     
     # 設定偏移值校正
-    def setShift(self,v=0):
+    def setShift(self,val=0):
+        v = int(val)
         self.shift = v
     
     # 設定比例值校正
-    def setRadial(self, v=1.0):
+    def setRadial(self, val=1.0):
+        v = float(val)
         self.radial = v
     
     # 取得校正後數值

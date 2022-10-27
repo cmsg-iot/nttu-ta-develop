@@ -1,5 +1,5 @@
 from machine import Pin
-
+from utime import sleep
 class GPIO:
     def __init__(self, pin=0, mode=0):
         self.pin = pin
@@ -14,5 +14,11 @@ class GPIO:
     def getValue(self):
         return Pin(self.pin).value()
 
-    def setValue(self,v=0):
-        Pin(self.pin).value(v)
+    def setValue(self,val=0):
+        Pin(self.pin).value(val)
+    
+    def openWithTime(self,time=1):
+        t = int(time)
+        Pin(self.pin).value(1)
+        sleep(t)
+        Pin(self.pin).value(0)

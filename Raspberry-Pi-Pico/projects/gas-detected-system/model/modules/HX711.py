@@ -12,7 +12,8 @@ class HX711:
         self.shift2zero = 0.0
     
     # 設定 hx711 增益頻道
-    def setChannel(self,v=0):
+    def setChannel(self,val=0):
+        v = int(val)
         if(v==0):
             self.driver.channel = lib.hx711.HX711.CHANNEL_B_32
         elif(v==1):
@@ -21,11 +22,13 @@ class HX711:
             self.driver.channel = lib.hx711.HX711.CHANNEL_A_128
 
     # 設定偏移值校正
-    def setShift(self,v=0):
+    def setShift(self,val=0):
+        v = int(val)
         self.shift = v
 
     # 設定比例值校正
-    def setRadial(self,v=1.0):
+    def setRadial(self,val=1.0):
+        v = float(val)
         self.radial = v
 
     # 設定歸零值

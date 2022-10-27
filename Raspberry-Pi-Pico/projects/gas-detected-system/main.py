@@ -28,8 +28,10 @@ allow_cmd_list = [
     "set buzzer off",
     "set heater on",
     "set heater off",
-    "set valve on",
-    "set valve off"
+    "set valveOpen on",
+    "set valveOpen off",
+    "set valveClose on",
+    "set valveClose off"
 ]
 
 commandHandler = CommandHandler(allow_cmd_list=allow_cmd_list)
@@ -37,20 +39,27 @@ commandHandler = CommandHandler(allow_cmd_list=allow_cmd_list)
 print("Strat!")
 while True:
     counter+=1
-    cmd = model.store.__state['uart']
 
-    if cmd != None:
-        commandHandler.addAllowedCommand(cmd)
+    # 命令接收&執行
+    cmd = model.store.__state['uart']
+    if cmd != None :
+        
+        # 清除 state 中的 uart buffer
         model.store.__state['uart'] = None
+        
+        cmd = commandHandler.formatCommand(cmd)
+        
+        if commandHandler.checkCommandInAllowedList(cmd):
+            commandHandler.addCommandToQueue(cmd)
+
     commandHandler.executeCommandFromQueue()
     
-    # read uart buffer
+    # 讀取 uart buffer
     if counter >= 10:
         model.store.readUART()
 
-    # read data
+    # 讀取 data
     if counter >= 100:
         counter = 0
-        #model.store.setShift("pressure_in",500)
         model.store.readData()        
     utime.sleep_ms(10)

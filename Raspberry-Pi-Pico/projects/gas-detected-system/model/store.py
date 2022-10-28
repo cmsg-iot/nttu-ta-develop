@@ -8,6 +8,7 @@ from machine import Pin,UART
 import uasyncio as asyncio
 from utime import sleep_ms
 import json
+import os
 from controller.commandHandler import CommandHandler
 
 allow_cmd_list = [
@@ -22,8 +23,6 @@ allow_cmd_list = [
     "set hx711 ch",
     "set hx711 shift",
     "set hx711 radial",
-    "set hx711 zero",
-    "reset hx711 zero",
     "set buzzer on",
     "set buzzer off",
     "set heater on",
@@ -97,8 +96,6 @@ def dispatchAction(cmd_list):
         setTargetWithValue(cmd_list[1],cmd_list[2],cmd_list[3])
     elif cmd_list[0] == "set" and cmd_list[3] == None:
         setTarget(cmd_list[1],cmd_list[2])
-    elif cmd_list[0] == "reset":
-        resetTarget(cmd_list[1],cmd_list[2])
     elif cmd_list[0] == "log":
         setLog(cmd_list[1])
     else:
@@ -125,13 +122,6 @@ def setTarget(target,act):
         getTargetObject(target).setShiftZero()
     else:
         setMessage("Missing 1 required argument")
-    
-
-def resetTarget(target,act):
-    if act =="zero":
-        getTargetObject(target).resetShiftZero()
-    else:
-        setMessage("Not vaild target")
 
 def getTargetObject(target=""):
     if target == "pressure_in":
@@ -209,10 +199,38 @@ __state = {
         'valveOpen':0,
         'valveClose':0
     },
+    'config':{
+        'pressure_in':{
+            'shift':0,
+            'radial':1.0
+        },
+        'pressure_out':{
+            'shift':0,
+            'radial':1.0
+        },
+        'mq2':{
+            'shift':0,
+            'radial':1.0
+        },
+        'mq2_2':{
+            'shift':0,
+            'radial':1.0
+        },
+        'mq7':{
+            'shift':0,
+            'radial':1.0
+        },
+        'hx711':{
+            'ch':0,
+            'shift':0,
+            'radial':1.0
+        }
+    },
     'uart':None,
     'message':"",
     'log':False
 }
+
 
 initialDeviceStateWithConfigFile(parser.configParser.__deviceConfig)
 
@@ -221,6 +239,7 @@ async def readData():
     swriter = asyncio.StreamWriter(uart, {})
     while True:
         
+        # DATA
         __state['data']['pressure_in'] = pressure_in.getValue()
         await asyncio.sleep_ms(5)
         
@@ -259,9 +278,53 @@ async def readData():
 
         __state['data']['valveClose'] =valveClose.getValue()
         await asyncio.sleep_ms(5)
+
+        # Config
+        __state['config']['pressure_in']['shift'] = pressure_in.shift
+        await asyncio.sleep_ms(5)
+
+        __state['config']['pressure_in']['radial'] = pressure_in.radial
+        await asyncio.sleep_ms(5)
         
-        newData = dict(__state['data'])
+        __state['config']['pressure_out']['shift'] = pressure_out.shift
+        await asyncio.sleep_ms(5)
+
+        __state['config']['pressure_out']['radial'] = pressure_out.radial
+        await asyncio.sleep_ms(5)
+
+        __state['config']['mq2']['shift'] = mq2.shift
+        await asyncio.sleep_ms(5)
+
+        __state['config']['mq2']['radial'] = mq2.radial
+        await asyncio.sleep_ms(5)
+
+        __state['config']['shift'] = mq2_2.shift
+        await asyncio.sleep_ms(5)
+
+        __state['config']['radial'] = mq2_2.radial
+        await asyncio.sleep_ms(5)
+
+        __state['config']['shift'] = mq7.shift
+        await asyncio.sleep_ms(5)
+
+        __state['config']['radial'] = mq7.radial
+        await asyncio.sleep_ms(5)
+
+        __state['config']['shift'] = hx711.shift
+        await asyncio.sleep_ms(5)
+
+        __state['config']['radial'] = hx711.radial
+        await asyncio.sleep_ms(5)
+
+        __state['config']['ch'] = hx711.channel
+        await asyncio.sleep_ms(5)
+        
+        newData = {}
+        data = {'data':__state['data']}
+        config = {'config':__state['config']}
         message = {'message':__state['message']}
+        newData.update(data)
+        newData.update(config)
         newData.update(message)
         j = json.dumps(newData)
 
@@ -299,9 +362,27 @@ async def readUART():
         await sreader.drain()
         await asyncio.sleep_ms(250)
 
+def getFileListOfPath(rootPath):
+    file_list = []
+    for i in os.listdir(rootPath):
+        file_list.append(rootPath + "/" + i)
+    return file_list
+
+async def executeRules(path_list):
+    print(path_list)
+    while True:
+        for i in path_list:
+            f = open(i,'r')
+            exec(f.read())
+            f.close()
+            await asyncio.sleep_ms(50)
+        await asyncio.sleep(1)
+
 async def main():
+    path_list = getFileListOfPath('/rules')
     asyncio.create_task(readData())
     asyncio.create_task(readUART())
+    #asyncio.create_task(executeRules(path_list))
     
     while True:
         await asyncio.sleep(1)
@@ -316,3 +397,4 @@ def start():
         print('as_demos.auart.test() to run again.')
 
 start()
+

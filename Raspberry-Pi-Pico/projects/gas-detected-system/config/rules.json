@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "ruleName": "Gas Leak ",
+      "priority": 1,
+      "observe": [
+        {
+          "target1": "pressure_in",
+          "operator": ">",
+          "target2": "pressure_out",
+          "value": 0.5
+        }
+      ]
+    }
+  ]
+}

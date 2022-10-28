@@ -4,8 +4,41 @@ from modules.HX711 import HX711
 from modules.ADC import Adc
 from modules.UART import Uart
 import parser.configParser
+from machine import Pin,UART
+import uasyncio as asyncio
 from utime import sleep_ms
 import json
+from controller.commandHandler import CommandHandler
+
+allow_cmd_list = [
+    "set pressure_in shift",
+    "set pressure_in radial",
+    "set pressure_out shift",
+    "set pressure_out radial",
+    "set mq2 shift",
+    "set mq2 radial",
+    "set mq7 shift",
+    "set mq7 radial",
+    "set hx711 ch",
+    "set hx711 shift",
+    "set hx711 radial",
+    "set hx711 zero",
+    "reset hx711 zero",
+    "set buzzer on",
+    "set buzzer off",
+    "set heater on",
+    "set heater off",
+    "set valveOpen on",
+    "set valveOpen off",
+    "set valveClose on",
+    "set valveClose off",
+    "log on",
+    "log off",
+    "help"
+]
+
+configPath = "/config/config.json"
+configTargets = ["pressure_in","pressure_out","mq2","mq2_2","mq7","hx711"]
 
 am2320 = AM2320(i2cNum=0,scl=17,sda=16,freq=100000)
 hx711 = HX711(d_out=4,pd_sck=5)
@@ -19,8 +52,10 @@ mq2 = Adc(channel=1)
 mq2_2 = Adc(channel=2)
 pressure_in = Adc(channel=3)
 pressure_out = Adc(channel=4)
-uart=Uart(uartNum=0,baud=115200,rxPin=1,txPin=0)
-uart.init()
+#uart=Uart(0, baudrate=115200, parity=None, stop=1, bits=8,timeout=3)
+uart=UART(0, baudrate=115200, parity=None, stop=1, bits=8)
+#uart.init()
+commandHandler = CommandHandler(allow_cmd_list=allow_cmd_list)
 
 def initialDeviceStateWithConfigFile(state):
     for target in state:
@@ -35,8 +70,13 @@ def initialDeviceStateWithConfigFile(state):
                 t.setChannel(v)
 
 def excuteCommand(cmd):
+    message = "excuted: " + cmd
+    setMessage(message)
+    logMessage(message)
     cmd_list = getSeperatedCommandList(cmd)
     dispatchAction(cmd_list)
+    sleep_ms(10)
+    writeTargetsParamToFile(configPath,configTargets)
 
 def getSeperatedCommandList(cmd):
     cmd_list = separateCommandWithSpace(cmd)
@@ -59,6 +99,8 @@ def dispatchAction(cmd_list):
         setTarget(cmd_list[1],cmd_list[2])
     elif cmd_list[0] == "reset":
         resetTarget(cmd_list[1],cmd_list[2])
+    elif cmd_list[0] == "log":
+        setLog(cmd_list[1])
     else:
         setMessage("not vaild method")
 
@@ -115,6 +157,37 @@ def getTargetObject(target=""):
     else:
         return None
 
+def writeTargetsParamToFile(path,targets):
+    jsonString = formatTartgetsParamToJson(targets)
+    writeJsonToFile(path,jsonString)
+
+def formatTartgetsParamToJson(targets):
+    j = {}
+    for i in targets:
+        j[i] = {}
+        if i == "hx711":
+            j[i]['ch'] = getTargetObject(i).channel
+        j[i]['shift'] = getTargetObject(i).shift
+        j[i]['radial'] = getTargetObject(i).radial
+    return json.dumps(j)
+
+def writeJsonToFile(path,jsonString):
+    f = open(path,'w')
+    f.write(jsonString)
+    f.close()
+    logMessage("Write json to: " + path)
+
+def setLog(flag):
+    global __state
+    if flag == "on":
+        __state['log'] = True
+    else:
+        __state['log'] = False
+
+def logMessage(message):
+    if __state['log']:
+        print(message)
+
 global __state
 __state = {
     'data':{
@@ -133,89 +206,112 @@ __state = {
         'valveClose':0
     },
     'uart':None,
-    'message':""
+    'message':"",
+    'log':False
 }
 
 initialDeviceStateWithConfigFile(parser.configParser.__deviceConfig)
 
-def init():
+async def readData():
     global __state
-    __state = {
-    'data':{
-        'pressure_in':0.0,
-        'pressure_out':0.0,
-        'temp':0.0,
-        'hum':0.0,
-        'hx711':0.0,
-        'mq2':0,
-        'mq2_2':0,
-        'mq7':0,
-        'hall':0,
-        'buzzer':0,
-        'heater':0,
-        'valveOpen':0,
-        'valveClose':0
-    },
-    'uart':None,
-    'message':""
-}
+    swriter = asyncio.StreamWriter(uart, {})
+    while True:
+        
+        __state['data']['pressure_in'] = pressure_in.getValue()
+        await asyncio.sleep_ms(5)
+        
+        __state['data']['pressure_out'] = pressure_out.getValue()
+        await asyncio.sleep_ms(5)
 
-def readData():
-    global __state
-
-    __state['data']['pressure_in'] = pressure_in.getValue()
-    sleep_ms(5)
-
-    __state['data']['pressure_out'] = pressure_out.getValue()
-    sleep_ms(5)
-
-    am2320Data = am2320.getMeasureData()
-    if am2320Data != None:
-        __state['data']['temp'] = am2320Data['temp']
-        __state['data']['hum'] = am2320Data['hum']
-    sleep_ms(5)
+        am2320Data = am2320.getMeasureData()
+        if am2320Data != None:
+            __state['data']['temp'] = am2320Data['temp']
+            __state['data']['hum'] = am2320Data['hum']
+        await asyncio.sleep_ms(5)
     
-    __state['data']['hx711'] = hx711.getValue()
-    sleep_ms(5)
+        __state['data']['hx711'] = hx711.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['mq2'] = mq2.getValue()
-    sleep_ms(5)
+        __state['data']['mq2'] = mq2.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['mq2_2'] = mq2_2.getValue()
-    sleep_ms(5)
+        __state['data']['mq2_2'] = mq2_2.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['mq7'] = mq7.getValue()
-    sleep_ms(5)
+        __state['data']['mq7'] = mq7.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['hall'] = hall.getValue()
-    sleep_ms(5)
+        __state['data']['hall'] = hall.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['buzzer'] = buzzer.getValue()
-    sleep_ms(5)
+        __state['data']['buzzer'] = buzzer.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['heater'] = heater.getValue()
-    sleep_ms(5)
+        __state['data']['heater'] = heater.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['valveOpen'] =valveOpen.getValue()
-    sleep_ms(5)
+        __state['data']['valveOpen'] =valveOpen.getValue()
+        await asyncio.sleep_ms(5)
 
-    __state['data']['valveClose'] =valveClose.getValue()
-    sleep_ms(5)
+        __state['data']['valveClose'] =valveClose.getValue()
+        await asyncio.sleep_ms(5)
+        
+        newData = dict(__state['data'])
+        message = {'message':__state['message']}
+        newData.update(message)
+        j = json.dumps(newData)
+        #print(j)
+        # clear message
+        if len(__state['message']) > 0:
+            __state['message'] = ""
+        swriter.write(str(j))
+        await swriter.drain()
+        await asyncio.sleep(1)
 
-    newData = dict(__state['data'])
-    message = {'message':__state['message']}
-    newData.update(message)
-    j = json.dumps(newData)
-    #print(j)
-    uart.write(str(j))
-    
-    # clear message
-    if len(__state['message']) > 0:
-        __state['message'] = ""
+async def receiver():
+    sreader = asyncio.StreamReader(uart)
+    while True:
+        res = await sreader.readline()
 
-def readUART():
+async def readUART():
     global __state
-    __state['uart'] = uart.readline()
+    swriter = asyncio.StreamWriter(uart, {})
+    sreader = asyncio.StreamReader(uart)
+    while True:
+        cmd = await sreader.readline()
+        if cmd != None and cmd != b'' :
+            cmd = commandHandler.formatCommand(cmd)        
+            if commandHandler.checkCommandInAllowedList(cmd):
+                #print(cmd)
+                if cmd == "help":
+                    l = {'allow_cmd_list': allow_cmd_list}
+                    await swriter.write(str(json.dumps(l)))
+            else:
+                commandHandler.addCommandToQueue(cmd)
+        commandHandler.executeCommandFromQueue()
+        logMessage(cmd)
+        cmd = None
+        await sreader.drain()
+        await swriter.drain()
+        await asyncio.sleep_ms(100)
+
+async def main():
+    asyncio.create_task(readData())
+    asyncio.create_task(readUART())
+    
+    while True:
+        await asyncio.sleep(1)
+
+def start():
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Interrupted")
+    finally:
+        asyncio.new_event_loop()
+        print('as_demos.auart.test() to run again.')
+
+start()
 
 def setMessage(message):
     global __state

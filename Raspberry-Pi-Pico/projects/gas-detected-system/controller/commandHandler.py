@@ -24,6 +24,7 @@ class CommandHandler:
     
     # 將命令加入 queue 中
     def addCommandToQueue(self,cmd):
+        print(cmd)
         self.cmd_queue.append(cmd)
     
     # 先進先出執行 queue 中的命令
@@ -31,6 +32,4 @@ class CommandHandler:
         if len(self.cmd_queue) > 0:
             cmd = self.cmd_queue.pop(0)
             model.store.excuteCommand(cmd)
-            message = "excuted: " + cmd
-            print(message)
-            
+            print(cmd)

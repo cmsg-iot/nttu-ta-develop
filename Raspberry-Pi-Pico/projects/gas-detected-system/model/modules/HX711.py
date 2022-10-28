@@ -8,8 +8,6 @@ class HX711:
         self.driver.channel = lib.hx711.HX711.CHANNEL_B_32
         self.shift = 0
         self.radial = 1.0
-        self.current = 0.0
-        self.shift2zero = 0.0
         self.channel = 0
     
     # 設定 hx711 增益頻道
@@ -31,17 +29,10 @@ class HX711:
     # 設定比例值校正
     def setRadial(self,val=1.0):
         v = float(val)
+        if v <= 0.0: return
         self.radial = v
-
-    # 設定歸零值
-    def setShiftZero(self):
-        self.shift2zero = self.current
     
-    # 清除歸零值
-    def resetShiftZero(self):
-        self.shift2zero = 0
-    
-    # 取得校正後重量(扣除歸零值)
+    # 取得校正後重量
     def getValue(self):
         read = self.driver.read()
         read = -read
@@ -49,5 +40,5 @@ class HX711:
         if(read<0):
             read = 0
         read /= self.radial
-        self.current = read
-        return read - self.shift2zero
+        read = round(read)
+        return read

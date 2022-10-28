@@ -12,7 +12,9 @@ class AM2320:
     def getMeasureData(self):
         data = {}
         if self.sensor.measure() != False:
-            data['temp'] = self.sensor.temperature()
-            data['hum'] = self.sensor.humidity()
+            temp = self.sensor.temperature()
+            hum = self.sensor.humidity()
+            data['temp'] = round(temp * 10) / 10
+            data['hum'] =  round(hum * 10) / 10
             return data
         return None

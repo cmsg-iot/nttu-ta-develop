@@ -16,6 +16,7 @@ class Adc(CD74HC4067):
     # 設定比例值校正
     def setRadial(self, val=1.0):
         v = float(val)
+        if v <= 0.0: return
         self.radial = v
     
     # 取得校正後數值
@@ -25,4 +26,5 @@ class Adc(CD74HC4067):
         if(read < 0):
             read = 0
         read /= self.radial
+        read = round(read * 100) / 100
         return read

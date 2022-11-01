@@ -13,7 +13,6 @@ from utility.common import logMessage
 import state
 
 configPath = "/config/config.json"
-#configTargets = ["pressure_in","pressure_out","mq2","mq2_2","mq7","hx711"]
 
 am2320 = AM2320(i2cNum=0,scl=17,sda=16,freq=100000)
 hx711 = HX711(d_out=4,pd_sck=5)
@@ -107,12 +106,12 @@ def resetTarget(target):
 def resetConfigFileAndState():
     global __state
     __state = initialState(state.state)
-    mq2.init()
-    mq2_2.init()
-    mq7.init()
-    pressure_in.init()
-    pressure_out.init()
-    hx711.init()
+    mq2.initConfig()
+    mq2_2.initConfig()
+    mq7.initConfig()
+    pressure_in.initConfig()
+    pressure_out.initConfig()
+    hx711.initConfig()
     updateFileWithState(configPath,__state)
 
 def getTargetObject(target=""):

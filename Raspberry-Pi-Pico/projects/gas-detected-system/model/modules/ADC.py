@@ -8,6 +8,11 @@ class Adc(CD74HC4067):
         self.shift = 0
         self.radial = 1.0
     
+    # 初始化設定
+    def init(self):
+        self.shift = 0
+        self.radial = 1.0
+    
     # 設定偏移值校正
     def setShift(self,val=0):
         v = int(val)

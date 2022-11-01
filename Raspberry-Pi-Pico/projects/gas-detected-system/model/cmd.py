@@ -20,7 +20,9 @@ allow_cmd_list = [
     "set valveOpen off",
     "set valveClose on",
     "set valveClose off",
+    "reset config",
     "log on",
     "log off",
     "help"
 ]
+

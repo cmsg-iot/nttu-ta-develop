@@ -10,6 +10,12 @@ class HX711:
         self.radial = 1.0
         self.channel = 0
     
+    # 初始化設定
+    def init(self):
+        self.shift = 0
+        self.radial = 1.0
+        self.channel = 0
+    
     # 設定 hx711 增益頻道
     def setChannel(self,val=0):
         v = int(val)

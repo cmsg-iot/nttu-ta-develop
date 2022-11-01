@@ -33,7 +33,6 @@ async def handleCommand():
     global previous_config
     while True:
         cmd = model.store.__state['uart']
-        #model.store.setMessage(cmd)
         commandHandler.handleCommandExecuted(cmd)
         previous_config = model.store.__state['config']
         model.store.__state['uart'] = None

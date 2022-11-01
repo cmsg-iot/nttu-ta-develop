@@ -29,8 +29,24 @@ pressure_in = Adc(channel=3)
 pressure_out = Adc(channel=4)
 uart=UART(0, baudrate=115200, parity=None, stop=1, bits=8)
 
+def initialState(state):
+    newState = {}
+    newState['data'] = {}
+    newState['config'] = {}
+    for key in state['data']:
+        newState['data'][key] = state['data'][key]
+
+    for key in state['config']:
+        newState['config'][key] = {}
+        for param in state['config'][key]:
+            newState['config'][key][param] = state['config'][key][param]
+    for key in state:
+        if key != 'data' and key != 'config':
+            newState[key] = state[key]
+    return newState
+
 global __state
-__state = state.state
+__state = initialState(state.state)
 
 def excuteCommand(cmd):
     global __state
@@ -49,6 +65,8 @@ def dispatchAction(cmd_list):
         setTargetWithValue(cmd_list[1],cmd_list[2],cmd_list[3])
     elif cmd_list[0] == "set" and cmd_list[3] == None:
         setTarget(cmd_list[1],cmd_list[2])
+    elif cmd_list[0] == "reset":
+        resetTarget(cmd_list[1])
     elif cmd_list[0] == "log":
         setLog(cmd_list[1])
     else:
@@ -79,6 +97,23 @@ def setTarget(target,act):
         getTargetObject(target).setShiftZero()
     else:
         setMessage("Missing 1 required argument")
+
+def resetTarget(target):
+    if target == "config":
+        resetConfigFileAndState()
+    else:
+        setMessage("Not vaild target with reset")
+
+def resetConfigFileAndState():
+    global __state
+    __state = initialState(state.state)
+    mq2.init()
+    mq2_2.init()
+    mq7.init()
+    pressure_in.init()
+    pressure_out.init()
+    hx711.init()
+    updateFileWithState(configPath,__state)
 
 def getTargetObject(target=""):
     if target == "pressure_in":

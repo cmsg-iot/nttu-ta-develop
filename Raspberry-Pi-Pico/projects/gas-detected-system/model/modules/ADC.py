@@ -31,5 +31,5 @@ class Adc(CD74HC4067):
         if(read < 0):
             read = 0
         read /= self.radial
-        read = round(read * 100) / 100
+        read = float(f"{read:.2f}")
         return read

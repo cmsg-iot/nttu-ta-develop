@@ -14,7 +14,7 @@ class AM2320:
         if self.sensor.measure() != False:
             temp = self.sensor.temperature()
             hum = self.sensor.humidity()
-            data['temp'] = round(temp * 10) / 10
-            data['hum'] =  round(hum * 10) / 10
+            data['temp'] = float(f"{temp:.1f}")
+            data['hum'] =  float(f"{hum:.1f}")
             return data
         return None

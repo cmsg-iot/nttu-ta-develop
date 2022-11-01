@@ -17,7 +17,7 @@ class CommandHandler:
     # 格式化從uart過來的命令
     def formatCommand(self,cmd):
         if len(cmd) == 0: return
-        if ("vm<" in cmd):
+        if ("vm<" in cmd and "xff" not in cmd):
             s = str(cmd)[5:-5]
             return s
         return "Not vaild command"
@@ -31,3 +31,12 @@ class CommandHandler:
         if len(self.cmd_queue) > 0:
             cmd = self.cmd_queue.pop(0)
             model.store.excuteCommand(cmd)
+    
+    # 處理命令從檢查到執行
+    def handleCommandExecuted(self,cmd):
+        if cmd != None and cmd != b'' :
+            model.store.setMessage(cmd)
+            cmd = self.formatCommand(cmd)
+            if self.checkCommandInAllowedList(cmd):
+                self.addCommandToQueue(cmd)
+            self.executeCommandFromQueue()

@@ -44,8 +44,21 @@ def initialState(state):
             newState[key] = state[key]
     return newState
 
+
+
 global __state
 __state = initialState(state.state)
+
+def initialValve():
+    global __state
+
+    valveClose.setValue(1)
+    sleep_ms(2000)
+    valveClose.setValue(0)
+
+    __state['data']['valveState'] = 0
+
+initialValve()
 
 def excuteCommand(cmd):
     global __state
@@ -75,6 +88,10 @@ def setTargetWithValue(target,act,value):
     global __state
     if act == "on":
         getTargetObject(target).openWithTime(value)
+        if target == "valveOpen":
+            __state['data']['valveState'] = 1
+        elif target == "valveClose":
+            __state['data']['valveState'] = 0
     elif act == "shift":
         getTargetObject(target).setShift(value)
     elif act == "radial":
@@ -252,9 +269,11 @@ async def readData():
         data = {'data':__state['data']}
         config = {'config':__state['config']}
         message = {'message':__state['message']}
+        rules = {'rules':__state['rules']}
         newData.update(data)
         newData.update(config)
         newData.update(message)
+        newData.update(rules)
         j = json.dumps(newData)
 
         # clear message

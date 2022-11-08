@@ -12,7 +12,8 @@ state = {
         'buzzer':0,
         'heater':0,
         'valveOpen':0,
-        'valveClose':0
+        'valveClose':0,
+        'valveState':0
     },
     'config':{
         'pressure_in':{
@@ -41,6 +42,7 @@ state = {
             'radial':1.0
         }
     },
+    'rules':{},
     'uart':None,
     'message':"",
     'log':False,

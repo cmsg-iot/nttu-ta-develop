@@ -7,18 +7,6 @@
     "shift": 0,
     "radial": 1.0
   },
-  "mq2": {
-    "shift": 0,
-    "radial": 1.0
-  },
-  "mq2_2": {
-    "shift": 0,
-    "radial": 1.0
-  },
-  "mq7": {
-    "shift": 0,
-    "radial": 1.0
-  },
   "hx711": {
     "ch": 0,
     "shift": 0,

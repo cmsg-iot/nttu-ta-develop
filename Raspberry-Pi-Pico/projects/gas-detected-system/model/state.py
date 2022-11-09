@@ -5,8 +5,14 @@ state = {
         'temp':0.0,
         'hum':0.0,
         'hx711':0.0,
-        'mq2':0,
-        'mq2_2':0,
+        'mq2_smoke':0,
+        'mq2_LPG':0,
+        'mq2_methane':0,
+        'mq2_hydrogen':0,
+        'mq2_2_smoke':0,
+        'mq2_2_LPG':0,
+        'mq2_2_methane':0,
+        'mq2_2_hydrogen':0,
         'mq7':0,
         'hall':0,
         'buzzer':0,
@@ -21,18 +27,6 @@ state = {
             'radial':1.0
         },
         'pressure_out':{
-            'shift':0,
-            'radial':1.0
-        },
-        'mq2':{
-            'shift':0,
-            'radial':1.0
-        },
-        'mq2_2':{
-            'shift':0,
-            'radial':1.0
-        },
-        'mq7':{
             'shift':0,
             'radial':1.0
         },

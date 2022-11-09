@@ -236,31 +236,31 @@ async def readData():
         __state['data']['hx711'] = hx711.getValue()
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_smoke'] = mq2.readSmoke()
+        __state['data']['mq2_smoke'] = round(mq2.readSmoke()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_LPG'] = mq2.readLPG()
+        __state['data']['mq2_LPG'] = round(mq2.readLPG()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_methane'] = mq2.readMethane()
+        __state['data']['mq2_methane'] = round(mq2.readMethane()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_hydrogen'] = mq2.readHydrogen()
+        __state['data']['mq2_hydrogen'] = round(mq2.readHydrogen()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_2_smoke'] = mq2_2.readSmoke()
+        __state['data']['mq2_2_smoke'] = round(mq2_2.readSmoke()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_2_LPG'] = mq2_2.readLPG()
+        __state['data']['mq2_2_LPG'] = round(mq2_2.readLPG()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_2_methane'] = mq2_2.readMethane()
+        __state['data']['mq2_2_methane'] = round(mq2_2.readMethane()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_2_hydrogen'] = mq2_2.readHydrogen()
+        __state['data']['mq2_2_hydrogen'] = round(mq2_2.readHydrogen()) * 2
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq7'] = mq7.readCarbonMonoxide()
+        __state['data']['mq7'] = round(mq7.readCarbonMonoxide()) * 2
         await asyncio.sleep_ms(5)
 
         __state['data']['hall'] = hall.getValue()

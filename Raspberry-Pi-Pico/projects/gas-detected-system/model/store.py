@@ -2,7 +2,9 @@ from modules.AM2320 import AM2320
 from modules.GPIO import GPIO
 from modules.HX711 import HX711
 from modules.ADC import Adc
-from machine import Pin,UART
+from modules.MQ2 import MQ2
+from modules.MQ7 import MQ7
+from machine import Pin, UART
 import uasyncio as asyncio
 from utime import sleep_ms
 import json
@@ -14,19 +16,27 @@ import state
 
 configPath = "/config/config.json"
 
-am2320 = AM2320(i2cNum=0,scl=17,sda=16,freq=100000)
-hx711 = HX711(d_out=4,pd_sck=5)
-hall = GPIO(pin=10,mode=0)
-buzzer = GPIO(pin=11,mode=1)
-heater = GPIO(pin=12,mode=1)
-valveOpen = GPIO(pin=13,mode=1)
-valveClose = GPIO(pin=14,mode=1)
-mq7 = Adc(channel=0)
-mq2 = Adc(channel=1)
-mq2_2 = Adc(channel=2)
+am2320 = AM2320(i2cNum=0, scl=17, sda=16, freq=100000)
+hx711 = HX711(d_out=4, pd_sck=5)
+hall = GPIO(pin=10, mode=0)
+buzzer = GPIO(pin=11, mode=1)
+heater = GPIO(pin=12, mode=1)
+valveOpen = GPIO(pin=13, mode=1)
+valveClose = GPIO(pin=14, mode=1)
+mq7 = MQ7(channel=0, baseVoltage=5.0)
+mq2 = MQ2(channel=1, baseVoltage=5.0)
+mq2_2 = MQ2(channel=2, baseVoltage=5.0)
 pressure_in = Adc(channel=3)
 pressure_out = Adc(channel=4)
-uart=UART(0, baudrate=115200, parity=None, stop=1, bits=8)
+uart = UART(0, baudrate=115200, parity=None, stop=1, bits=8)
+
+print("Calibrating")
+mq2.calibrate()
+mq2_2.calibrate()
+mq7.calibrate()
+print("Calibration completed")
+print("Base resistance:{0}".format(mq2._ro))
+
 
 def initialState(state):
     newState = {}
@@ -45,9 +55,9 @@ def initialState(state):
     return newState
 
 
-
 global __state
 __state = initialState(state.state)
+
 
 def initialValve():
     global __state
@@ -58,25 +68,28 @@ def initialValve():
 
     __state['data']['valveState'] = 0
 
+
 initialValve()
+
 
 def excuteCommand(cmd):
     global __state
-    Pin(25,Pin.OUT).value(1)
+    Pin(25, Pin.OUT).value(1)
     message = "Excuted: " + cmd
     setMessage(message)
-    logMessage(message,__state['log'])
+    logMessage(message, __state['log'])
     cmd_list = getSeperatedCommandList(cmd)
     dispatchAction(cmd_list)
     sleep_ms(50)
-    Pin(25,Pin.OUT).value(0)
-    updateFileWithState(configPath,__state)
+    Pin(25, Pin.OUT).value(0)
+    updateFileWithState(configPath, __state)
+
 
 def dispatchAction(cmd_list):
     if cmd_list[0] == "set" and cmd_list[3] != None:
-        setTargetWithValue(cmd_list[1],cmd_list[2],cmd_list[3])
+        setTargetWithValue(cmd_list[1], cmd_list[2], cmd_list[3])
     elif cmd_list[0] == "set" and cmd_list[3] == None:
-        setTarget(cmd_list[1],cmd_list[2])
+        setTarget(cmd_list[1], cmd_list[2])
     elif cmd_list[0] == "reset":
         resetTarget(cmd_list[1])
     elif cmd_list[0] == "log":
@@ -84,7 +97,8 @@ def dispatchAction(cmd_list):
     else:
         setMessage("Not vaild method: " + cmd_list[0])
 
-def setTargetWithValue(target,act,value):
+
+def setTargetWithValue(target, act, value):
     global __state
     if act == "on":
         getTargetObject(target).openWithTime(value)
@@ -100,11 +114,12 @@ def setTargetWithValue(target,act,value):
         getTargetObject(target).setChannel(value)
     else:
         setMessage("Not vaild target")
-    
+
     if act != "on":
         __state['isConfigUpdate'] = True
 
-def setTarget(target,act):
+
+def setTarget(target, act):
     if act == "on":
         getTargetObject(target).setValue(1)
     elif act == "off":
@@ -114,22 +129,22 @@ def setTarget(target,act):
     else:
         setMessage("Missing 1 required argument")
 
+
 def resetTarget(target):
     if target == "config":
         resetConfigFileAndState()
     else:
         setMessage("Not vaild target with reset")
 
+
 def resetConfigFileAndState():
     global __state
     __state = initialState(state.state)
-    mq2.initConfig()
-    mq2_2.initConfig()
-    mq7.initConfig()
     pressure_in.initConfig()
     pressure_out.initConfig()
     hx711.initConfig()
-    updateFileWithState(configPath,__state)
+    updateFileWithState(configPath, __state)
+
 
 def getTargetObject(target=""):
     if target == "pressure_in":
@@ -155,6 +170,7 @@ def getTargetObject(target=""):
     else:
         return None
 
+
 def initialDeviceStateWithConfigFile(state):
     for target in state:
         t = getTargetObject(target)
@@ -167,7 +183,9 @@ def initialDeviceStateWithConfigFile(state):
             elif param == "ch":
                 t.setChannel(v)
 
+
 initialDeviceStateWithConfigFile(getConfigFromPath("/config/config.json"))
+
 
 def setLog(flag):
     global __state
@@ -176,38 +194,60 @@ def setLog(flag):
     else:
         __state['log'] = False
 
+
 def setMessage(message):
     global __state
     __state['message'] = message
+
 
 async def readData():
     global __state
     swriter = asyncio.StreamWriter(uart, {})
     while True:
-        
+
         # DATA
         __state['data']['pressure_in'] = pressure_in.getValue()
         await asyncio.sleep_ms(5)
-        
+
         __state['data']['pressure_out'] = pressure_out.getValue()
         await asyncio.sleep_ms(5)
 
+        """
         am2320Data = am2320.getMeasureData()
         if am2320Data != None:
             __state['data']['temp'] = am2320Data['temp']
             __state['data']['hum'] = am2320Data['hum']
         await asyncio.sleep_ms(5)
-    
+        """
+
         __state['data']['hx711'] = hx711.getValue()
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2'] = mq2.getValue()
+        __state['data']['mq2_smoke'] = mq2.readSmoke()
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq2_2'] = mq2_2.getValue()
+        __state['data']['mq2_LPG'] = mq2.readLPG()
         await asyncio.sleep_ms(5)
 
-        __state['data']['mq7'] = mq7.getValue()
+        __state['data']['mq2_methane'] = mq2.readMethane()
+        await asyncio.sleep_ms(5)
+
+        __state['data']['mq2_hydrogen'] = mq2.readHydrogen()
+        await asyncio.sleep_ms(5)
+
+        __state['data']['mq2_2_smoke'] = mq2_2.readSmoke()
+        await asyncio.sleep_ms(5)
+
+        __state['data']['mq2_2_LPG'] = mq2_2.readLPG()
+        await asyncio.sleep_ms(5)
+
+        __state['data']['mq2_2_methane'] = mq2_2.readMethane()
+        await asyncio.sleep_ms(5)
+
+        __state['data']['mq2_2_hydrogen'] = mq2_2.readHydrogen()
+        await asyncio.sleep_ms(5)
+
+        __state['data']['mq7'] = mq7.readCarbonMonoxide()
         await asyncio.sleep_ms(5)
 
         __state['data']['hall'] = hall.getValue()
@@ -219,10 +259,10 @@ async def readData():
         __state['data']['heater'] = heater.getValue()
         await asyncio.sleep_ms(5)
 
-        __state['data']['valveOpen'] =valveOpen.getValue()
+        __state['data']['valveOpen'] = valveOpen.getValue()
         await asyncio.sleep_ms(5)
 
-        __state['data']['valveClose'] =valveClose.getValue()
+        __state['data']['valveClose'] = valveClose.getValue()
         await asyncio.sleep_ms(5)
 
         # Config
@@ -231,29 +271,11 @@ async def readData():
 
         __state['config']['pressure_in']['radial'] = pressure_in.radial
         await asyncio.sleep_ms(5)
-        
+
         __state['config']['pressure_out']['shift'] = pressure_out.shift
         await asyncio.sleep_ms(5)
 
         __state['config']['pressure_out']['radial'] = pressure_out.radial
-        await asyncio.sleep_ms(5)
-
-        __state['config']['mq2']['shift'] = mq2.shift
-        await asyncio.sleep_ms(5)
-
-        __state['config']['mq2']['radial'] = mq2.radial
-        await asyncio.sleep_ms(5)
-
-        __state['config']['mq2_2']['shift'] = mq2_2.shift
-        await asyncio.sleep_ms(5)
-
-        __state['config']['mq2_2']['radial'] = mq2_2.radial
-        await asyncio.sleep_ms(5)
-
-        __state['config']['mq7']['shift'] = mq7.shift
-        await asyncio.sleep_ms(5)
-
-        __state['config']['mq7']['radial'] = mq7.radial
         await asyncio.sleep_ms(5)
 
         __state['config']['hx711']['shift'] = hx711.shift
@@ -264,12 +286,12 @@ async def readData():
 
         __state['config']['hx711']['ch'] = hx711.channel
         await asyncio.sleep_ms(5)
-        
+
         newData = {}
-        data = {'data':__state['data']}
-        config = {'config':__state['config']}
-        message = {'message':__state['message']}
-        rules = {'rules':__state['rules']}
+        data = {'data': __state['data']}
+        config = {'config': __state['config']}
+        message = {'message': __state['message']}
+        rules = {'rules': __state['rules']}
         newData.update(data)
         newData.update(config)
         newData.update(message)
@@ -283,21 +305,23 @@ async def readData():
         await swriter.drain()
         await asyncio.sleep(1)
 
+
 async def readUART():
     global __state
     sreader = asyncio.StreamReader(uart, {})
     while True:
         cmd = await sreader.readline()
         __state['uart'] = cmd
-        logMessage(cmd,__state['log'])
+        logMessage(cmd, __state['log'])
         cmd = ""
         await sreader.drain()
         await asyncio.sleep_ms(250)
 
+
 async def executeRules(path_list):
     while True:
         for i in path_list:
-            f = open(i,'r')
+            f = open(i, 'r')
             exec(f.read())
             f.close()
             await asyncio.sleep_ms(50)

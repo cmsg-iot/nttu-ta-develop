@@ -29,13 +29,7 @@ mq2_2 = MQ2(channel=2, baseVoltage=5.0)
 pressure_in = Adc(channel=3)
 pressure_out = Adc(channel=4)
 uart = UART(0, baudrate=115200, parity=None, stop=1, bits=8)
-
-print("Calibrating")
-mq2.calibrate()
-mq2_2.calibrate()
-mq7.calibrate()
-print("Calibration completed")
-print("Base resistance:{0}".format(mq2._ro))
+pico_led = Pin(25, Pin.OUT)
 
 
 def initialState(state):
@@ -62,8 +56,12 @@ __state = initialState(state.state)
 def initialValve():
     global __state
 
+    pico_led.value(1)
+    print("Turn valve off...")
     valveClose.setValue(1)
     sleep_ms(2000)
+    pico_led.value(0)
+    print("Valve turned off.")
     valveClose.setValue(0)
 
     __state['data']['valveState'] = 0
@@ -72,16 +70,30 @@ def initialValve():
 initialValve()
 
 
+def initialMQ():
+    pico_led.value(1)
+    print("Calibrating")
+    mq2.calibrate()
+    mq2_2.calibrate()
+    mq7.calibrate()
+    print("Calibration completed")
+    print("Base resistance:{0}".format(mq2._ro))
+    pico_led.value(0)
+
+
+initialMQ()
+
+
 def excuteCommand(cmd):
     global __state
-    Pin(25, Pin.OUT).value(1)
+    pico_led.value(1)
     message = "Excuted: " + cmd
     setMessage(message)
     logMessage(message, __state['log'])
     cmd_list = getSeperatedCommandList(cmd)
     dispatchAction(cmd_list)
     sleep_ms(50)
-    Pin(25, Pin.OUT).value(0)
+    pico_led.value(0)
     updateFileWithState(configPath, __state)
 
 
@@ -205,6 +217,7 @@ async def readData():
     swriter = asyncio.StreamWriter(uart, {})
     while True:
 
+        pico_led.value(1)
         # DATA
         __state['data']['pressure_in'] = pressure_in.getValue()
         await asyncio.sleep_ms(5)
@@ -297,6 +310,8 @@ async def readData():
         newData.update(message)
         newData.update(rules)
         j = json.dumps(newData)
+
+        pico_led.value(0)
 
         # clear message
         if len(__state['message']) > 0:

@@ -59,7 +59,7 @@ def initialValve():
     pico_led.value(1)
     print("Turn valve off...")
     valveClose.setValue(1)
-    sleep_ms(2000)
+    sleep_ms(5000)
     pico_led.value(0)
     print("Valve turned off.")
     valveClose.setValue(0)
